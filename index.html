@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vintage Watches | ساعات كلاسيكية فاخرة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- مكتبة Firebase للمزامنة السحابية -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
+        body { background-color: #121212; color: #e0e0e0; line-height: 1.6; }
+        
+        header { background: #1a1a1a; padding: 15px 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 10px; }
+        .logo { font-size: 1.4rem; font-weight: 900; color: #d4af37; letter-spacing: 1px; text-decoration: none; }
+        .header-btns { display: flex; gap: 10px; align-items: center; }
+        
+        .btn-opt { background: transparent; border: 1px solid #d4af37; color: #d4af37; padding: 6px 12px; border-radius: 4px; cursor: pointer; transition: 0.3s; font-size: 0.85rem; font-weight: bold; text-decoration: none; }
+        .btn-opt:hover { background: #d4af37; color: #121212; }
+        
+        .hero { text-align: center; padding: 50px 20px; background: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)), url('https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1200&q=80') center/cover; }
+        .hero h1 { font-size: 2.2rem; color: #d4af37; margin-bottom: 10px; }
+        .hero p { color: #aaa; font-size: 1rem; }
+
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .section-header { border-bottom: 2px solid #d4af37; padding-bottom: 10px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
+        .section-header h2 { color: #d4af37; font-size: 1.5rem; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 25px; }
+        
+        .watch-card { background: #1e1e1e; border: 1px solid #2c2c2c; border-radius: 8px; overflow: hidden; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.4); display: flex; flex-direction: column; justify-content: space-between; }
+        .watch-card:hover { transform: translateY(-4px); border-color: #d4af37; }
+        
+        .main-img { width: 100%; height: 240px; object-fit: cover; background: #000; }
+        .thumbnails { display: flex; gap: 6px; padding: 10px; background: #161616; overflow-x: auto; border-bottom: 1px solid #282828; }
+        .thumbnails img { width: 48px; height: 48px; object-fit: cover; border-radius: 4px; cursor: pointer; border: 1px solid #444; }
+        .thumbnails img:hover { border-color: #d4af37; }
+
+        .watch-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .watch-title { font-size: 1.15rem; font-weight: bold; color: #fff; margin-bottom: 6px; }
+        .watch-details { font-size: 0.88rem; color: #aaa; margin-bottom: 12px; white-space: pre-line; }
+        .watch-price { font-size: 1.25rem; font-weight: 900; color: #d4af37; margin-bottom: 12px; }
+        
+        .buy-btn { display: block; width: 100%; background: #d4af37; color: #121212; text-align: center; padding: 10px; border-radius: 4px; text-decoration: none; font-weight: bold; transition: 0.3s; border: none; cursor: pointer; }
+        .buy-btn:hover { background: #c5a059; }
+
+        /* لوحة التحكم */
+        .admin-panel { background: #1a1a1a; border: 1px solid #d4af37; padding: 20px; margin-bottom: 30px; border-radius: 8px; display: none; }
+        .admin-panel.active { display: block; }
+        .form-control { width: 100%; padding: 10px; margin-bottom: 10px; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 4px; }
+        
+        /* تصميم مربعات الصور بنفس أسلوب مشروع "جَوّنا" المباشر والموثوق للهواتف */
+        .file-box { background: #242424; padding: 10px; border: 1px solid #333; border-radius: 6px; margin-bottom: 10px; }
+        .file-box label { font-size: 0.85rem; color: #d4af37; font-weight: bold; display: block; margin-bottom: 6px; }
+        .file-box input[type="file"] { width: 100%; padding: 8px; background: #1a1a1a; color: #fff; border: 1px solid #444; border-radius: 4px; font-size: 0.85rem; cursor: pointer; }
+
+        /* النوافذ المنبثقة */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 200; display: none; }
+        .modal-content { background: #1e1e1e; border: 1px solid #d4af37; padding: 25px; border-radius: 8px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; position: relative; color: #ccc; }
+        .close-btn { position: absolute; top: 10px; left: 15px; background: none; border: none; font-size: 24px; color: #fff; cursor: pointer; }
+
+        /* تصميم استمارة الفيزا والدفع */
+        .card-icons { display: flex; gap: 8px; margin-bottom: 15px; justify-content: center; background: #151515; padding: 8px; border-radius: 4px; border: 1px solid #333; }
+        .card-badge { background: #2a2a2a; color: #d4af37; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; border: 1px solid #444; }
+        .row-inputs { display: flex; gap: 10px; }
+
+        footer { text-align: center; padding: 25px 10px; color: #777; border-top: 1px solid #222; margin-top: 50px; font-size: 0.85rem; }
+        footer a { color: #d4af37; text-decoration: none; margin: 0 10px; }
+        footer a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="#homeSection" class="logo">⏳ VINTAGE WATCHES</a>
+        <div class="header-btns">
+            <a href="#homeSection" class="btn-opt" id="homeBtn">الرئيسية 🏠</a>
+            <button class="btn-opt" onclick="toggleLanguage()" id="langBtn">English 🌐</button>
+            <button class="btn-opt" onclick="toggleAdmin()" id="adminBtn">لوحة المشرف 🔒</button>
+        </div>
+    </header>
+
+    <div class="hero">
+        <h1 id="heroTitle">ساعات تنبض بعراقة الماضي</h1>
+        <p id="heroSub">تشكيلة فاخرة ومختارة بعناية من الساعات الكلاسيكية الأصلية</p>
+    </div>
+
+    <div class="container">
+        <!-- لوحة المشرف لإضافة وتعديل الساعات -->
+        <div class="admin-panel" id="adminPanel">
+            <h3 style="color: #d4af37; margin-bottom: 15px;" id="adminFormTitle">إضافة / تعديل ساعة جديدة</h3>
+            <form id="watchForm" onsubmit="saveWatch(event)">
+                <input type="hidden" id="watchId">
+                <input type="text" id="watchName" class="form-control" placeholder="اسم الموديل (مثال: Rolex Datejust Vintage)" required>
+                
+                <!-- حقل المواصفات بالعربية -->
+                <textarea id="watchDetailsAr" class="form-control" placeholder="تفاصيل وحالة الساعة بالعربية (المواصفات، النظافة، الميناء)" rows="3" required></textarea>
+                
+                <!-- حقل المواصفات بالإنجليزية -->
+                <textarea id="watchDetailsEn" class="form-control" placeholder="Watch details & specifications in English" rows="3"></textarea>
+
+                <input type="number" id="watchPrice" class="form-control" placeholder="السعر ($)" required>
+                
+                <h4 style="color:#d4af37; margin: 15px 0 10px;" id="lblUploadTitle">📷 تحميل الصور (اختر حتى 4 صور من هاتفك أو حاسوبك):</h4>
+                
+                <!-- حقول رفع الصور المباشرة الناجحة في الهواتف -->
+                <div class="file-box">
+                    <label id="lblImg1">الصورة 1 (رئيسية - إجبارية):</label>
+                    <input type="file" id="file1" accept="image/*">
+                </div>
+
+                <div class="file-box">
+                    <label id="lblImg2">الصورة 2:</label>
+                    <input type="file" id="file2" accept="image/*">
+                </div>
+
+                <div class="file-box">
+                    <label id="lblImg3">الصورة 3:</label>
+                    <input type="file" id="file3" accept="image/*">
+                </div>
+
+                <div class="file-box">
+                    <label id="lblImg4">الصورة 4:</label>
+                    <input type="file" id="file4" accept="image/*">
+                </div>
+
+                <button type="submit" class="buy-btn" style="margin-top: 15px;" id="saveBtn">🚀 حفظ ونشر الساعة</button>
+            </form>
+            
+            <div style="margin-top: 25px;">
+                <h4 style="color: #fff; margin-bottom: 10px;" id="manageTitle">إدارة الساعات المضافة:</h4>
+                <div id="adminWatchesList"></div>
+            </div>
+        </div>
+
+        <!-- قسم الرئيسية لعرض الساعات المضافة -->
+        <section id="homeSection">
+            <div class="section-header">
+                <h2 id="homeTitle">الرئيسية - المعرض الرئيسي للساعات</h2>
+            </div>
+            <div class="grid" id="watchesGrid"></div>
+        </section>
+    </div>
+
+    <!-- نافذة الشراء الإلكتروني وإدخال بطاقة الفيزا -->
+    <div class="modal" id="checkoutModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeCheckoutModal()">×</button>
+            <h3 style="color:#d4af37; margin-bottom: 5px; text-align: center;" id="checkoutTitle">الدفع الإلكتروني الآمن</h3>
+            <p style="text-align: center; font-size:0.85rem; color:#aaa; margin-bottom: 15px;" id="checkoutSub">أدخل معلومات بطاقتك الائتمانية لإتمام الشراء</p>
+            
+            <div class="card-icons">
+                <span class="card-badge">💳 VISA</span>
+                <span class="card-badge">💳 MasterCard</span>
+                <span class="card-badge">💳 AMEX</span>
+            </div>
+
+            <div style="background: #141414; padding: 10px; border-radius: 4px; margin-bottom: 15px; border-right: 3px solid #d4af37;">
+                <p style="font-size: 0.9rem; color: #fff;" id="itemSummary"></p>
+                <p style="font-size: 1.1rem; font-weight: bold; color: #d4af37;" id="priceSummary"></p>
+            </div>
+
+            <form id="paymentForm" onsubmit="processPayment(event)">
+                <label style="font-size: 0.85rem; color: #d4af37; display: block; margin-bottom: 3px;" id="lblHolder">اسم صاحب البطاقة:</label>
+                <input type="text" id="cardHolder" class="form-control" placeholder="John Doe" required>
+
+                <label style="font-size: 0.85rem; color: #d4af37; display: block; margin-bottom: 3px;" id="lblNumber">رقم البطاقة (16 رقم):</label>
+                <input type="text" id="cardNumber" class="form-control" placeholder="4000 0000 0000 0000" maxlength="19" required oninput="formatCardNumber(this)">
+
+                <div class="row-inputs">
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.85rem; color: #d4af37; display: block; margin-bottom: 3px;" id="lblExp">تاريخ الانتهاء:</label>
+                        <input type="text" id="cardExp" class="form-control" placeholder="MM/YY" maxlength="5" required>
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.85rem; color: #d4af37; display: block; margin-bottom: 3px;" id="lblCvv">رمز الأمان (CVV):</label>
+                        <input type="password" id="cardCvv" class="form-control" placeholder="123" maxlength="4" required>
+                    </div>
+                </div>
+
+                <label style="font-size: 0.85rem; color: #d4af37; display: block; margin-bottom: 3px;" id="lblPhone">رقم الهاتف للتأكيد والتوصيل:</label>
+                <input type="tel" id="custPhone" class="form-control" placeholder="+962 7XXXXXXXX" required>
+
+                <button type="submit" class="buy-btn" style="margin-top: 15px;" id="confirmPayBtn">🔒 تأكيد وتدقيق العملية</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة الشروط وسياسة الخصوصية -->
+    <div class="modal" id="policyModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closePolicyModal()">×</button>
+            <h3 id="modalTitle" style="color:#d4af37; margin-bottom: 15px;"></h3>
+            <div id="modalBody" style="line-height: 1.7; font-size: 0.95rem;"></div>
+        </div>
+    </div>
+
+    <footer>
+        <div style="margin-bottom: 10px;">
+            <a href="javascript:void(0)" onclick="openPolicy('privacy')" id="privacyLink">سياسة الخصوصية</a> | 
+            <a href="javascript:void(0)" onclick="openPolicy('terms')" id="termsLink">الشروط والأحكام</a>
+        </div>
+        <p id="footerCopy">جميع الحقوق محفوظة © 2026 - Vintage Watches</p>
+    </footer>
+
+    <script>
+        const firebaseConfig = { databaseURL: "https://vintage-watches-default-rtdb.firebaseio.com" };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.database();
+
+        let watchesList = JSON.parse(localStorage.getItem('vintage_watches_local')) || [];
+        let currentLang = 'ar';
+        let selectedWatch = null;
+
+        const texts = {
+            ar: {
+                homeBtn: "الرئيسية 🏠",
+                langBtn: "English 🌐",
+                adminBtn: "لوحة المشرف 🔒",
+                heroTitle: "ساعات تنبض بعراقة الماضي",
+                heroSub: "تشكيلة فاخرة ومختارة بعناية من الساعات الكلاسيكية الأصلية",
+                homeTitle: "الرئيسية - المعرض الرئيسي للساعات",
+                buyBtn: "💳 شراء الآن (فيزا / بطاقة)",
+                noWatches: "لا توجد ساعات معروضة حالياً. اضف بعض الساعات من لوحة المشرف.",
+                privacyLink: "سياسة الخصوصية",
+                termsLink: "الشروط والأحكام",
+                footerCopy: "جميع الحقوق محفوظة © 2026 - Vintage Watches",
+                adminFormTitle: "إضافة / تعديل ساعة جديدة",
+                saveBtn: "🚀 حفظ ونشر الساعة",
+                manageTitle: "إدارة الساعات المضافة:",
+                checkoutTitle: "الدفع الإلكتروني الآمن",
+                checkoutSub: "أدخل معلومات بطاقتك الائتمانية لإتمام الشراء",
+                lblHolder: "اسم صاحب البطاقة:",
+                lblNumber: "رقم البطاقة (16 رقم):",
+                lblExp: "تاريخ الانتهاء:",
+                lblCvv: "رمز الأمان (CVV):",
+                lblPhone: "رقم الهاتف للتأكيد والتوصيل:",
+                confirmPayBtn: "🔒 تأكيد وتدقيق العملية",
+                modalPrivacyTitle: "سياسة الخصوصية",
+                modalTermsTitle: "الشروط والأحكام",
+                modalPrivacyBody: `<p>نحن في <strong>Vintage Watches</strong> نلتزم بالحفاظ على خصوصية معلومات زوارنا.</p><p>1. نستخدم بيانات الاتصال والدفع لإتمام التوصيل والمعاملات بآمان.</p><p>2. لا نشارك بياناتك مع أي أطراف ثالثة خارج حدود معالجة الدفع والشحن.</p><p>لأي استفسارات بخصوص بياناتك تواصل معنا عبر البريد: <strong>scopedigital9@gmail.com</strong></p>`,
+                modalTermsBody: `<p>مرحباً بك في متجر <strong>Vintage Watches</strong>.</p><p>1. كافة الساعات المعروضة هي ساعات كلاسيكية يتم التأكد من حالاتها بدقة.</p><p>2. عملية الشراء المباشر تتم بأمان عبر بطاقة الائتمان/الفيزا.</p><p>3. في حال وجود أي استفسار عن الطلب يمكنك مراسلتنا فوراً عبر البريد: <strong>scopedigital9@gmail.com</strong></p>`
+            },
+            en: {
+                homeBtn: "Home 🏠",
+                langBtn: "عربي 🌐",
+                adminBtn: "Admin Panel 🔒",
+                heroTitle: "Timeless Vintage Watches",
+                heroSub: "A curated collection of authentic, classic luxury timepieces",
+                homeTitle: "Home - Main Watch Gallery",
+                buyBtn: "💳 Buy Now (Visa / Card)",
+                noWatches: "No watches available at the moment. Add some from the admin panel.",
+                privacyLink: "Privacy Policy",
+                termsLink: "Terms & Conditions",
+                footerCopy: "All Rights Reserved © 2026 - Vintage Watches",
+                adminFormTitle: "Add / Edit Watch",
+                saveBtn: "🚀 Save & Publish Watch",
+                manageTitle: "Manage Added Watches:",
+                checkoutTitle: "Secure Online Checkout",
+                checkoutSub: "Enter your credit card details to complete purchase",
+                lblHolder: "Cardholder Name:",
+                lblNumber: "Card Number:",
+                lblExp: "Expiration Date:",
+                lblCvv: "Security Code (CVV):",
+                lblPhone: "Phone Number for delivery:",
+                confirmPayBtn: "🔒 Confirm Payment",
+                modalPrivacyTitle: "Privacy Policy",
+                modalTermsTitle: "Terms & Conditions",
+                modalPrivacyBody: `<p>At <strong>Vintage Watches</strong>, we are committed to protecting your privacy.</p><p>1. Contact and payment information is used strictly to process orders securely.</p><p>2. We do not sell or share your data with unauthorized third parties.</p><p>For inquiries, contact us at: <strong>scopedigital9@gmail.com</strong></p>`,
+                modalTermsBody: `<p>Welcome to <strong>Vintage Watches</strong>.</p><p>1. All watches listed are authentic vintage timepieces inspected for quality.</p><p>2. Payments are completed directly & securely via Visa/Credit card.</p><p>For support, please reach out to us at: <strong>scopedigital9@gmail.com</strong></p>`
+            }
+        };
+
+        function initApp() {
+            renderWatches();
+            renderAdminList();
+
+            try {
+                db.ref('watches').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        watchesList = Object.values(data);
+                        localStorage.setItem('vintage_watches_local', JSON.stringify(watchesList));
+                        renderWatches();
+                        renderAdminList();
+                    }
+                });
+            } catch(e) {
+                console.log("Using local storage fallback");
+            }
+        }
+
+        function renderWatches() {
+            const grid = document.getElementById('watchesGrid');
+            grid.innerHTML = '';
+            
+            if (!watchesList || watchesList.length === 0) {
+                grid.innerHTML = `<p style="color:#777; grid-column: 1/-1; text-align:center; padding: 40px;">${texts[currentLang].noWatches}</p>`;
+                return;
+            }
+
+            watchesList.forEach(w => {
+                const imgs = w.images || [];
+                const mainImg = imgs[0] || 'https://via.placeholder.com/300x300?text=No+Image';
+                
+                let detailsText = "";
+                if (currentLang === 'en') {
+                    detailsText = w.detailsEn && w.detailsEn.trim() !== "" ? w.detailsEn : (w.detailsAr || w.details || "Authentic Vintage Timepiece.");
+                } else {
+                    detailsText = w.detailsAr && w.detailsAr.trim() !== "" ? w.detailsAr : (w.details || "ساعة كلاسيكية فاخرة بحالة ممتازة.");
+                }
+
+                let thumbsHtml = '';
+                imgs.forEach((img, idx) => {
+                    if(img) thumbsHtml += `<img src="${img}" onclick="changeMainImg('${w.id}', ${idx})">`;
+                });
+
+                grid.innerHTML += `
+                    <div class="watch-card">
+                        <div>
+                            <img src="${mainImg}" class="main-img" id="main_${w.id}">
+                            <div class="thumbnails">${thumbsHtml}</div>
+                        </div>
+                        <div class="watch-info">
+                            <div>
+                                <div class="watch-title">${w.name}</div>
+                                <div class="watch-details">${detailsText}</div>
+                            </div>
+                            <div>
+                                <div class="watch-price">$${w.price}</div>
+                                <button onclick="openCheckout('${w.id}')" class="buy-btn">${texts[currentLang].buyBtn}</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function changeMainImg(id, index) {
+            const watch = watchesList.find(w => w.id === id);
+            if (watch && watch.images && watch.images[index]) {
+                document.getElementById(`main_${id}`).src = watch.images[index];
+            }
+        }
+
+        function openCheckout(id) {
+            selectedWatch = watchesList.find(w => w.id === id);
+            if (!selectedWatch) return;
+
+            document.getElementById('itemSummary').innerText = (currentLang === 'ar' ? 'الساعة: ' : 'Watch: ') + selectedWatch.name;
+            document.getElementById('priceSummary').innerText = (currentLang === 'ar' ? 'الإجمالي: $' : 'Total: $') + selectedWatch.price;
+            document.getElementById('checkoutModal').style.display = 'flex';
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkoutModal').style.display = 'none';
+        }
+
+        function formatCardNumber(input) {
+            let val = input.value.replace(/\D/g, '');
+            let newArray = [];
+            for(let i=0; i<val.length; i+=4) {
+                newArray.push(val.substring(i, i+4));
+            }
+            input.value = newArray.join(' ');
+        }
+
+        function processPayment(e) {
+            e.preventDefault();
+            alert(currentLang === 'ar' ? "تمت معالجة الطلب وبانتظار التأكيد المالي. شكراً لشراءك!" : "Payment processed successfully! Thank you for your order.");
+            document.getElementById('paymentForm').reset();
+            closeCheckoutModal();
+        }
+
+        function toggleAdmin() {
+            const pass = prompt(currentLang === 'ar' ? "أدخل كلمة مرور المشرف:" : "Enter Admin Password:");
+            if (pass === "moh62") {
+                document.getElementById('adminPanel').classList.toggle('active');
+            } else if (pass) {
+                alert(currentLang === 'ar' ? "كلمة المرور غير صحيحة" : "Incorrect Password");
+            }
+        }
+
+        // دالة تحويل وضغط الصور لتناسب السيرفر وتصغير الحجم للهاتف
+        function processImageFile(file) {
+            return new Promise((resolve, reject) => {
+                if (!file) { resolve(null); return; }
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const maxDim = 800;
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > height && width > maxDim) {
+                            height *= maxDim / width;
+                            width = maxDim;
+                        } else if (height > maxDim) {
+                            width *= maxDim / height;
+                            height = maxDim;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.8));
+                    };
+                    img.onerror = () => resolve(event.target.result);
+                };
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        async function saveWatch(e) {
+            e.preventDefault();
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerText = currentLang === 'ar' ? "جاري معالجة ورفع الصور..." : "Processing images...";
+
+            try {
+                const editId = document.getElementById('watchId').value;
+                const id = editId || 'watch_' + Date.now();
+
+                const existingWatch = watchesList.find(w => w.id === id) || {};
+                const existingImages = existingWatch.images || [];
+
+                const f1 = document.getElementById('file1').files[0];
+                const f2 = document.getElementById('file2').files[0];
+                const f3 = document.getElementById('file3').files[0];
+                const f4 = document.getElementById('file4').files[0];
+
+                const img1 = f1 ? await processImageFile(f1) : (existingImages[0] || '');
+                const img2 = f2 ? await processImageFile(f2) : (existingImages[1] || '');
+                const img3 = f3 ? await processImageFile(f3) : (existingImages[2] || '');
+                const img4 = f4 ? await processImageFile(f4) : (existingImages[3] || '');
+
+                const images = [img1, img2, img3, img4].filter(Boolean);
+
+                if (images.length === 0) {
+                    alert(currentLang === 'ar' ? "يرجى اختيار صورة واحدة على الأقل!" : "Please upload at least one image!");
+                    saveBtn.disabled = false;
+                    saveBtn.innerText = texts[currentLang].saveBtn;
+                    return;
+                }
+
+                const watchData = {
+                    id: id,
+                    name: document.getElementById('watchName').value,
+                    detailsAr: document.getElementById('watchDetailsAr').value,
+                    detailsEn: document.getElementById('watchDetailsEn').value,
+                    price: document.getElementById('watchPrice').value,
+                    images: images
+                };
+
+                const index = watchesList.findIndex(w => w.id === id);
+                if (index > -1) {
+                    watchesList[index] = watchData;
+                } else {
+                    watchesList.unshift(watchData);
+                }
+                localStorage.setItem('vintage_watches_local', JSON.stringify(watchesList));
+                renderWatches();
+                renderAdminList();
+
+                try {
+                    db.ref('watches/' + id).set(watchData);
+                } catch(err) {
+                    console.log("Cloud sync error");
+                }
+
+                alert(currentLang === 'ar' ? "🚀 تم نشر الساعة بنجاح وتظهر الآن في قسم الرئيسية!" : "🚀 Watch published successfully and displayed in Home section!");
+                document.getElementById('watchForm').reset();
+                document.getElementById('watchId').value = '';
+                
+                window.location.href = '#homeSection';
+            } catch (err) {
+                alert(currentLang === 'ar' ? "حدث خطأ أثناء رفع الصور." : "Error uploading images.");
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerText = texts[currentLang].saveBtn;
+            }
+        }
+
+        function renderAdminList() {
+            const listDiv = document.getElementById('adminWatchesList');
+            if(!listDiv) return;
+            listDiv.innerHTML = '';
+            watchesList.forEach(w => {
+                listDiv.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:#242424; padding:10px; margin-bottom:8px; border-radius:4px;">
+                        <span>${w.name} ($${w.price})</span>
+                        <div>
+                            <button onclick="editWatch('${w.id}')" style="background:#d4af37; border:none; padding:5px 10px; cursor:pointer; border-radius:3px; font-weight:bold;">تعديل / Edit</button>
+                            <button onclick="deleteWatch('${w.id}')" style="background:#c0392b; color:#fff; border:none; padding:5px 10px; cursor:pointer; border-radius:3px; margin-right:5px; font-weight:bold;">حذف / Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function editWatch(id) {
+            const w = watchesList.find(item => item.id === id);
+            if (!w) return;
+            document.getElementById('watchId').value = w.id;
+            document.getElementById('watchName').value = w.name;
+            document.getElementById('watchDetailsAr').value = w.detailsAr || w.details || '';
+            document.getElementById('watchDetailsEn').value = w.detailsEn || '';
+            document.getElementById('watchPrice').value = w.price;
+            window.scrollTo({top: document.getElementById('adminPanel').offsetTop, behavior: 'smooth'});
+        }
+
+        function deleteWatch(id) {
+            if (confirm(currentLang === 'ar' ? "هل أنت متأكد من الحذف؟" : "Are you sure you want to delete?")) {
+                watchesList = watchesList.filter(w => w.id !== id);
+                localStorage.setItem('vintage_watches_local', JSON.stringify(watchesList));
+                renderWatches();
+                renderAdminList();
+                try { db.ref('watches/' + id).remove(); } catch(e){}
+            }
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            document.documentElement.lang = currentLang;
+            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+
+            const t = texts[currentLang];
+            document.getElementById('homeBtn').innerText = t.homeBtn;
+            document.getElementById('langBtn').innerText = t.langBtn;
+            document.getElementById('adminBtn').innerText = t.adminBtn;
+            document.getElementById('heroTitle').innerText = t.heroTitle;
+            document.getElementById('heroSub').innerText = t.heroSub;
+            document.getElementById('homeTitle').innerText = t.homeTitle;
+            document.getElementById('privacyLink').innerText = t.privacyLink;
+            document.getElementById('termsLink').innerText = t.termsLink;
+            document.getElementById('footerCopy').innerText = t.footerCopy;
+            document.getElementById('adminFormTitle').innerText = t.adminFormTitle;
+            document.getElementById('saveBtn').innerText = t.saveBtn;
+            document.getElementById('manageTitle').innerText = t.manageTitle;
+
+            document.getElementById('checkoutTitle').innerText = t.checkoutTitle;
+            document.getElementById('checkoutSub').innerText = t.checkoutSub;
+            document.getElementById('lblHolder').innerText = t.lblHolder;
+            document.getElementById('lblNumber').innerText = t.lblNumber;
+            document.getElementById('lblExp').innerText = t.lblExp;
+            document.getElementById('lblCvv').innerText = t.lblCvv;
+            document.getElementById('lblPhone').innerText = t.lblPhone;
+            document.getElementById('confirmPayBtn').innerText = t.confirmPayBtn;
+
+            renderWatches();
+        }
+
+        function openPolicy(type) {
+            const t = texts[currentLang];
+            document.getElementById('modalTitle').innerText = type === 'privacy' ? t.modalPrivacyTitle : t.modalTermsTitle;
+            document.getElementById('modalBody').innerHTML = type === 'privacy' ? t.modalPrivacyBody : t.modalTermsBody;
+            document.getElementById('policyModal').style.display = 'flex';
+        }
+
+        function closePolicyModal() {
+            document.getElementById('policyModal').style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
