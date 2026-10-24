@@ -42,15 +42,14 @@
         .watch-details { font-size: 0.88rem; color: #aaa; margin-bottom: 12px; white-space: pre-line; }
         .watch-price { font-size: 1.25rem; font-weight: 900; color: #d4af37; margin-bottom: 12px; }
         
-        .buy-btn { display: block; width: 100%; background: #d4af37; color: #121212; text-align: center; padding: 10px; border-radius: 4px; text-decoration: none; font-weight: bold; transition: 0.3s; border: none; cursor: pointer; }
-        .buy-btn:hover { background: #c5a059; }
+        .whatsapp-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: #25d366; color: #fff; text-align: center; padding: 10px; border-radius: 4px; text-decoration: none; font-weight: bold; transition: 0.3s; border: none; cursor: pointer; }
+        .whatsapp-btn:hover { background: #1ebe5d; }
 
         /* لوحة التحكم */
         .admin-panel { background: #1a1a1a; border: 1px solid #d4af37; padding: 20px; margin-bottom: 30px; border-radius: 8px; display: none; }
         .admin-panel.active { display: block; }
         .form-control { width: 100%; padding: 10px; margin-bottom: 10px; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 4px; }
         
-        /* تصميم مربعات الصور بنفس أسلوب مشروع "جَوّنا" المباشر والموثوق للهواتف */
         .file-box { background: #242424; padding: 10px; border: 1px solid #333; border-radius: 6px; margin-bottom: 10px; }
         .file-box label { font-size: 0.85rem; color: #d4af37; font-weight: bold; display: block; margin-bottom: 6px; }
         .file-box input[type="file"] { width: 100%; padding: 8px; background: #1a1a1a; color: #fff; border: 1px solid #444; border-radius: 4px; font-size: 0.85rem; cursor: pointer; }
@@ -59,11 +58,6 @@
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 200; display: none; }
         .modal-content { background: #1e1e1e; border: 1px solid #d4af37; padding: 25px; border-radius: 8px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; position: relative; color: #ccc; }
         .close-btn { position: absolute; top: 10px; left: 15px; background: none; border: none; font-size: 24px; color: #fff; cursor: pointer; }
-
-        /* تصميم استمارة الفيزا والدفع */
-        .card-icons { display: flex; gap: 8px; margin-bottom: 15px; justify-content: center; background: #151515; padding: 8px; border-radius: 4px; border: 1px solid #333; }
-        .card-badge { background: #2a2a2a; color: #d4af37; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; border: 1px solid #444; }
-        .row-inputs { display: flex; gap: 10px; }
 
         footer { text-align: center; padding: 25px 10px; color: #777; border-top: 1px solid #222; margin-top: 50px; font-size: 0.85rem; }
         footer a { color: #d4af37; text-decoration: none; margin: 0 10px; }
@@ -104,7 +98,6 @@
                 
                 <h4 style="color:#d4af37; margin: 15px 0 10px;" id="lblUploadTitle">📷 تحميل الصور (اختر حتى 4 صور من هاتفك أو حاسوبك):</h4>
                 
-                <!-- حقول رفع الصور المباشرة الناجحة في الهواتف -->
                 <div class="file-box">
                     <label id="lblImg1">الصورة 1 (رئيسية - إجبارية):</label>
                     <input type="file" id="file1" accept="image/*">
@@ -125,7 +118,7 @@
                     <input type="file" id="file4" accept="image/*">
                 </div>
 
-                <button type="submit" class="buy-btn" style="margin-top: 15px;" id="saveBtn">🚀 حفظ ونشر الساعة</button>
+                <button type="submit" class="whatsapp-btn" style="margin-top: 15px; background: #d4af37; color: #121212;" id="saveBtn">🚀 حفظ ونشر الساعة</button>
             </form>
             
             <div style="margin-top: 25px;">
@@ -141,50 +134,6 @@
             </div>
             <div class="grid" id="watchesGrid"></div>
         </section>
-    </div>
-
-    <!-- نافذة الشراء الإلكتروني وإدخال بطاقة الفيزا -->
-    <div class="modal" id="checkoutModal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeCheckoutModal()">×</button>
-            <h3 style="color:#d4af37; margin-bottom: 5px; text-align: center;" id="checkoutTitle">الدفع الإلكتروني الآمن</h3>
-            <p style="text-align: center; font-size:0.85rem; color:#aaa; margin-bottom: 15px;" id="checkoutSub">أدخل معلومات بطاقتك الائتمانية لإتمام الشراء</p>
-            
-            <div class="card-icons">
-                <span class="card-badge">💳 VISA</span>
-                <span class="card-badge">💳 MasterCard</span>
-                <span class="card-badge">💳 AMEX</span>
-            </div>
-
-            <div style="background: #141414; padding: 10px; border-radius: 4px; margin-bottom: 15px; border-right: 3px solid #d4af37;">
-                <p style="font-size: 0.9rem; color: #fff;" id="itemSummary"></p>
-                <p style="font-size: 1.1rem; font-weight: bold; color: #d4af37;" id="priceSummary"></p>
-            </div>
-
-            <form id="paymentForm" onsubmit="processPayment(event)">
-                <label style="font-size: 0.85rem; color: #d4af37; display: block; margin-bottom: 3px;" id="lblHolder">اسم صاحب البطاقة:</label>
-                <input type="text" id="cardHolder" class="form-control" placeholder="John Doe" required>
-
-                <label style="font-size: 0.85rem; color: #d4af37; display: block; margin-bottom: 3px;" id="lblNumber">رقم البطاقة (16 رقم):</label>
-                <input type="text" id="cardNumber" class="form-control" placeholder="4000 0000 0000 0000" maxlength="19" required oninput="formatCardNumber(this)">
-
-                <div class="row-inputs">
-                    <div style="flex: 1;">
-                        <label style="font-size: 0.85rem; color: #d4af37; display: block; margin-bottom: 3px;" id="lblExp">تاريخ الانتهاء:</label>
-                        <input type="text" id="cardExp" class="form-control" placeholder="MM/YY" maxlength="5" required>
-                    </div>
-                    <div style="flex: 1;">
-                        <label style="font-size: 0.85rem; color: #d4af37; display: block; margin-bottom: 3px;" id="lblCvv">رمز الأمان (CVV):</label>
-                        <input type="password" id="cardCvv" class="form-control" placeholder="123" maxlength="4" required>
-                    </div>
-                </div>
-
-                <label style="font-size: 0.85rem; color: #d4af37; display: block; margin-bottom: 3px;" id="lblPhone">رقم الهاتف للتأكيد والتوصيل:</label>
-                <input type="tel" id="custPhone" class="form-control" placeholder="+962 7XXXXXXXX" required>
-
-                <button type="submit" class="buy-btn" style="margin-top: 15px;" id="confirmPayBtn">🔒 تأكيد وتدقيق العملية</button>
-            </form>
-        </div>
     </div>
 
     <!-- نافذة الشروط وسياسة الخصوصية -->
@@ -211,7 +160,6 @@
 
         let watchesList = JSON.parse(localStorage.getItem('vintage_watches_local')) || [];
         let currentLang = 'ar';
-        let selectedWatch = null;
 
         const texts = {
             ar: {
@@ -221,7 +169,7 @@
                 heroTitle: "ساعات تنبض بعراقة الماضي",
                 heroSub: "تشكيلة فاخرة ومختارة بعناية من الساعات الكلاسيكية الأصلية",
                 homeTitle: "الرئيسية - المعرض الرئيسي للساعات",
-                buyBtn: "💳 شراء الآن (فيزا / بطاقة)",
+                whatsappBtn: "💬 الاستفسار والشراء عبر الواتساب",
                 noWatches: "لا توجد ساعات معروضة حالياً. اضف بعض الساعات من لوحة المشرف.",
                 privacyLink: "سياسة الخصوصية",
                 termsLink: "الشروط والأحكام",
@@ -229,18 +177,10 @@
                 adminFormTitle: "إضافة / تعديل ساعة جديدة",
                 saveBtn: "🚀 حفظ ونشر الساعة",
                 manageTitle: "إدارة الساعات المضافة:",
-                checkoutTitle: "الدفع الإلكتروني الآمن",
-                checkoutSub: "أدخل معلومات بطاقتك الائتمانية لإتمام الشراء",
-                lblHolder: "اسم صاحب البطاقة:",
-                lblNumber: "رقم البطاقة (16 رقم):",
-                lblExp: "تاريخ الانتهاء:",
-                lblCvv: "رمز الأمان (CVV):",
-                lblPhone: "رقم الهاتف للتأكيد والتوصيل:",
-                confirmPayBtn: "🔒 تأكيد وتدقيق العملية",
                 modalPrivacyTitle: "سياسة الخصوصية",
                 modalTermsTitle: "الشروط والأحكام",
-                modalPrivacyBody: `<p>نحن في <strong>Vintage Watches</strong> نلتزم بالحفاظ على خصوصية معلومات زوارنا.</p><p>1. نستخدم بيانات الاتصال والدفع لإتمام التوصيل والمعاملات بآمان.</p><p>2. لا نشارك بياناتك مع أي أطراف ثالثة خارج حدود معالجة الدفع والشحن.</p><p>لأي استفسارات بخصوص بياناتك تواصل معنا عبر البريد: <strong>scopedigital9@gmail.com</strong></p>`,
-                modalTermsBody: `<p>مرحباً بك في متجر <strong>Vintage Watches</strong>.</p><p>1. كافة الساعات المعروضة هي ساعات كلاسيكية يتم التأكد من حالاتها بدقة.</p><p>2. عملية الشراء المباشر تتم بأمان عبر بطاقة الائتمان/الفيزا.</p><p>3. في حال وجود أي استفسار عن الطلب يمكنك مراسلتنا فوراً عبر البريد: <strong>scopedigital9@gmail.com</strong></p>`
+                modalPrivacyBody: `<p>نحن في <strong>Vintage Watches</strong> نلتزم بالحفاظ على خصوصية معلومات زوارنا.</p><p>1. نستخدم بيانات الاتصال لتسهيل التواصل وإتمام الاستفسارات عبر الواتساب.</p><p>2. لا نشارك بياناتك مع أي أطراف ثالثة.</p><p>لأي استفسارات تواصل معنا عبر البريد: <strong>scopedigital9@gmail.com</strong></p>`,
+                modalTermsBody: `<p>مرحباً بك في متجر <strong>Vintage Watches</strong>.</p><p>1. كافة الساعات المعروضة هي ساعات كلاسيكية يتم التأكد من حالاتها بدقة.</p><p>2. يتم التواصل مباشرة مع البائع عبر الواتساب لتأكيد الشراء والتوصيل.</p><p>للدعم تواصل معنا عبر البريد: <strong>scopedigital9@gmail.com</strong></p>`
             },
             en: {
                 homeBtn: "Home 🏠",
@@ -249,7 +189,7 @@
                 heroTitle: "Timeless Vintage Watches",
                 heroSub: "A curated collection of authentic, classic luxury timepieces",
                 homeTitle: "Home - Main Watch Gallery",
-                buyBtn: "💳 Buy Now (Visa / Card)",
+                whatsappBtn: "💬 Inquire / Buy via WhatsApp",
                 noWatches: "No watches available at the moment. Add some from the admin panel.",
                 privacyLink: "Privacy Policy",
                 termsLink: "Terms & Conditions",
@@ -257,18 +197,10 @@
                 adminFormTitle: "Add / Edit Watch",
                 saveBtn: "🚀 Save & Publish Watch",
                 manageTitle: "Manage Added Watches:",
-                checkoutTitle: "Secure Online Checkout",
-                checkoutSub: "Enter your credit card details to complete purchase",
-                lblHolder: "Cardholder Name:",
-                lblNumber: "Card Number:",
-                lblExp: "Expiration Date:",
-                lblCvv: "Security Code (CVV):",
-                lblPhone: "Phone Number for delivery:",
-                confirmPayBtn: "🔒 Confirm Payment",
                 modalPrivacyTitle: "Privacy Policy",
                 modalTermsTitle: "Terms & Conditions",
-                modalPrivacyBody: `<p>At <strong>Vintage Watches</strong>, we are committed to protecting your privacy.</p><p>1. Contact and payment information is used strictly to process orders securely.</p><p>2. We do not sell or share your data with unauthorized third parties.</p><p>For inquiries, contact us at: <strong>scopedigital9@gmail.com</strong></p>`,
-                modalTermsBody: `<p>Welcome to <strong>Vintage Watches</strong>.</p><p>1. All watches listed are authentic vintage timepieces inspected for quality.</p><p>2. Payments are completed directly & securely via Visa/Credit card.</p><p>For support, please reach out to us at: <strong>scopedigital9@gmail.com</strong></p>`
+                modalPrivacyBody: `<p>At <strong>Vintage Watches</strong>, we are committed to protecting your privacy.</p><p>1. Contact information is used strictly to facilitate inquiries via WhatsApp.</p><p>2. We do not sell or share your data with unauthorized third parties.</p><p>For inquiries, contact us at: <strong>scopedigital9@gmail.com</strong></p>`,
+                modalTermsBody: `<p>Welcome to <strong>Vintage Watches</strong>.</p><p>1. All watches listed are authentic vintage timepieces inspected for quality.</p><p>2. Orders and inquiries are coordinated directly with the seller via WhatsApp.</p><p>For support, please reach out to us at: <strong>scopedigital9@gmail.com</strong></p>`
             }
         };
 
@@ -319,6 +251,14 @@
                     if(img) thumbsHtml += `<img src="${img}" onclick="changeMainImg('${w.id}', ${idx})">`;
                 });
 
+                // رسالة الواتساب الجاهزة
+                const msgText = encodeURIComponent(
+                    currentLang === 'ar' 
+                        ? `مرحباً، أهتم بشراء هذه الساعة:\n- الموديل: ${w.name}\n- السعر: $${w.price}\nالرجاء تزويدي بالتفاصيل وكيفية إتمام الشراء.`
+                        : `Hello, I am interested in buying this watch:\n- Model: ${w.name}\n- Price: $${w.price}\nPlease provide details and delivery information.`
+                );
+                const whatsappUrl = `https://wa.me/00962799872042?text=${msgText}`;
+
                 grid.innerHTML += `
                     <div class="watch-card">
                         <div>
@@ -332,7 +272,7 @@
                             </div>
                             <div>
                                 <div class="watch-price">$${w.price}</div>
-                                <button onclick="openCheckout('${w.id}')" class="buy-btn">${texts[currentLang].buyBtn}</button>
+                                <a href="${whatsappUrl}" target="_blank" class="whatsapp-btn">${texts[currentLang].whatsappBtn}</a>
                             </div>
                         </div>
                     </div>
@@ -345,35 +285,6 @@
             if (watch && watch.images && watch.images[index]) {
                 document.getElementById(`main_${id}`).src = watch.images[index];
             }
-        }
-
-        function openCheckout(id) {
-            selectedWatch = watchesList.find(w => w.id === id);
-            if (!selectedWatch) return;
-
-            document.getElementById('itemSummary').innerText = (currentLang === 'ar' ? 'الساعة: ' : 'Watch: ') + selectedWatch.name;
-            document.getElementById('priceSummary').innerText = (currentLang === 'ar' ? 'الإجمالي: $' : 'Total: $') + selectedWatch.price;
-            document.getElementById('checkoutModal').style.display = 'flex';
-        }
-
-        function closeCheckoutModal() {
-            document.getElementById('checkoutModal').style.display = 'none';
-        }
-
-        function formatCardNumber(input) {
-            let val = input.value.replace(/\D/g, '');
-            let newArray = [];
-            for(let i=0; i<val.length; i+=4) {
-                newArray.push(val.substring(i, i+4));
-            }
-            input.value = newArray.join(' ');
-        }
-
-        function processPayment(e) {
-            e.preventDefault();
-            alert(currentLang === 'ar' ? "تمت معالجة الطلب وبانتظار التأكيد المالي. شكراً لشراءك!" : "Payment processed successfully! Thank you for your order.");
-            document.getElementById('paymentForm').reset();
-            closeCheckoutModal();
         }
 
         function toggleAdmin() {
@@ -545,15 +456,6 @@
             document.getElementById('adminFormTitle').innerText = t.adminFormTitle;
             document.getElementById('saveBtn').innerText = t.saveBtn;
             document.getElementById('manageTitle').innerText = t.manageTitle;
-
-            document.getElementById('checkoutTitle').innerText = t.checkoutTitle;
-            document.getElementById('checkoutSub').innerText = t.checkoutSub;
-            document.getElementById('lblHolder').innerText = t.lblHolder;
-            document.getElementById('lblNumber').innerText = t.lblNumber;
-            document.getElementById('lblExp').innerText = t.lblExp;
-            document.getElementById('lblCvv').innerText = t.lblCvv;
-            document.getElementById('lblPhone').innerText = t.lblPhone;
-            document.getElementById('confirmPayBtn').innerText = t.confirmPayBtn;
 
             renderWatches();
         }
