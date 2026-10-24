@@ -251,13 +251,13 @@
                     if(img) thumbsHtml += `<img src="${img}" onclick="changeMainImg('${w.id}', ${idx})">`;
                 });
 
-                // رسالة الواتساب الجاهزة
+                // تعديل رابط الواتساب بالصيغة الدولية المباشرة الصالحة للروابط (962799872042)
                 const msgText = encodeURIComponent(
                     currentLang === 'ar' 
                         ? `مرحباً، أهتم بشراء هذه الساعة:\n- الموديل: ${w.name}\n- السعر: $${w.price}\nالرجاء تزويدي بالتفاصيل وكيفية إتمام الشراء.`
                         : `Hello, I am interested in buying this watch:\n- Model: ${w.name}\n- Price: $${w.price}\nPlease provide details and delivery information.`
                 );
-                const whatsappUrl = `https://wa.me/00962799872042?text=${msgText}`;
+                const whatsappUrl = `https://wa.me/962799872042?text=${msgText}`;
 
                 grid.innerHTML += `
                     <div class="watch-card">
